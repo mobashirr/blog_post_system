@@ -6,9 +6,9 @@ this project is a simple back-end system for blog posts web based application
 providing a simple api at ... ip ...
 
 # key features
--- authintcation system implemented with session mannger
--- CRUD opreations on blogs (create, delete, update, ..etc)
--- posts storage
+- authintcation system implemented with session mannger
+- CRUD opreations on blogs (create, delete, update, ..etc)
+- posts storage
 
 # project architicure
 ```
@@ -25,38 +25,41 @@ providing a simple api at ... ip ...
     app.py  # app entry point
 ```
 
+
 # api endpoints
-1- Get requests
-    -- get all blogs
-        ```
-            /api/v1/blogs
-        ```
-    -- get blogs by user_id
+
+1. Get requests
+
+- get all blogs
+    ```
+    /api/v1/blogs/
+    ```
+- get blogs by user id
         ```
             /api/v1/blogs/<int:num>
-        ```
-2- Post requests
-    -- register a new user
-    ```
-        /api/v1/users {name,age,email}
-    ```
+       ```
+
+2. Post requests
+    -- post new user
+        /api/users {name,age,email}
     -- post new blog
         ```
-            /api/v1/blog {title,content}
+            api/blog/ {title,content}
         ```
+    -- register a new user
 
-3- put requests
-    -- alter user data
-        ```
-            /api/v1/users {new data}
-        ```
-    -- alter blogs data
-        ```
-            /api/v1/blogs
-        ```
-4- Delete requests
-    -- delete user data
+3. put requests
 
-    -- delete post
-
+- alter user data
+    ```
+        api/users/ {new data}
+    ```
+- alter blogs data
+    ```
+        api/blogs/ {new data}
+    ```
+4. Delete requests
+-
+-
+-
 
