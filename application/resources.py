@@ -12,7 +12,6 @@ from bcrypt import hashpw, gensalt, checkpw
 from application.auth import AUTH as authorizer
 
 
-
 class Users(Resource):
 	'''
 	we provide a resource for users private data (users emails and birthday, etc..)
@@ -41,6 +40,32 @@ class Users(Resource):
 				return jsonify({'users':user.json_all_data()});
 
 		return jsonify({'users':[]});
+
+	def put(self):
+
+		# get the access token from http headrs
+		authoraization_header = request.headers.get("Authorization");
+
+		if not authoraization_header:
+			return jsonify({'error': 'missing the authrization header'}),401;
+
+		if not authoraization_header.startswith("Bearer "):
+			return jsonify({'error': 'Bearer Authrization only allowed'}),401;
+
+
+		access_token = authoraization_header.split()[1];
+		authorized_user = authorizer.isauthorized(access_token);
+		if authorized_user:
+			data = request.get_json()
+			if data:
+				# Assuming the data contains keys like 'email', 'first_name', etc.
+				update_result = User.update_user(authorized_user, data)
+				return update_result
+			else:
+				return {'message': 'No new data provided'}, 400
+
+		return {'error': 'Unauthorized'}, 401
+
 
 
 class UserList(Resource):
@@ -116,7 +141,6 @@ class login(Resource):
 		'''
 		log in new user
 		'''
-
 		# arguments validator
 		parser = reqparse.RequestParser();
 		parser.add_argument('email', type=str, help='user email');
@@ -158,29 +182,30 @@ class BlogsList(Resource):
 		return jsonify({'blogs':blogs});
 
 	def post(self):
+		# Argument validator
+		parser = reqparse.RequestParser()
+		parser.add_argument('title', type=str, help='Blog title')
+		parser.add_argument('content', type=str, help='Blog content')
 
-		# argument validator
-		parser = reqparse.RequestParser();
-		parser.add_argument('title', type=str, help='blog title');
-		parser.add_argument('content', type=str, help='blog content');
-		data = parser.parse_args();
-		title = data.get('title');
-		content = data.get('content');
+		authorization_header = request.headers.get("Authorization")
 
-		authoraization_header = request.headers.get("Authorization");
+		if not authorization_header:
+			return {'error': 'Missing the authorization header'}, 401
 
-		if not authoraization_header:
-			return jsonify({'error': 'missing the authorization header'}),401;
+		if not authorization_header.startswith("Bearer "):
+			return {'error': 'Bearer Authentication is only allowed'}, 401
 
-		if not authoraization_header.startswith("Bearer "):
-			return jsonify({'error': 'Bearer Athentcation is only allowed'}),401;
-
-		access_token = authoraization_header.split()[1];
-		authorized_user = authorizer.isauthorized(access_token);
+		access_token = authorization_header.split()[1]
+		authorized_user = authorizer.isauthorized(access_token)
 		if authorized_user:
+			data = parser.parse_args()
+			title = data.get('title')
+			content = data.get('content')
 			if title and content:
-				New_blog = Blog.create_blog(title=title, content=content,author_id=authorized_user);
-				return jsonify({'messege': f'new blog with id {New_blog.blog_id} created'});
+				new_blog = Blog.create_blog(title=title, content=content, author_id=authorized_user)
+				return {'message': f'New blog with ID {new_blog.blog_id} created'}, 201
+			return {'message': 'Incomplete data received'}, 400
 		else:
-			return jsonify({'error': 'unauthorized action'});
+			return {'error': 'Unauthorized action'}, 403
+
 

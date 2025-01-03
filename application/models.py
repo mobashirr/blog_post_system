@@ -5,6 +5,7 @@
 
 from application.utils import db
 from datetime import datetime
+from bcrypt import hashpw, gensalt
 
 
 # User Model
@@ -92,14 +93,28 @@ class User(db.Model):
 
     @staticmethod
     def update_user(user_id, updates):
-        '''update user data'''
+        '''Update user data.'''
+        can_modify = ['first_name', 'last_name', 'email', 'birthday', "password"]
         user = User.query.get(user_id)
         if user:
             for key, value in updates.items():
-                setattr(user, key, value)
+                if key in can_modify:
+                    if key == "password":
+                        value = hashpw(value.encode('utf-8'), gensalt())
+                        key = "hashed_password"
+                    elif key == "birthday":
+                        try:
+                            value = datetime.strptime(value, '%Y/%m/%d').date()
+                        except ValueError:
+                            return {'error': f"Invalid date format for birthday: {value}. Please use YYYY/MM/DD format."}, 400
+                    elif key == "email":
+                        used_email = User.check_if_email_exist(value)
+                        if used_email:
+                            return {'error': f"Email {value} is already in use."}, 400
+                    setattr(user, key, value)
             db.session.commit()
-            return user
-        return None
+            return {'message': f'User {user_id} updated successfully', 'user': user.json()}
+        return {'error': 'User not found'}, 404
 
     @staticmethod
     def delete_user(user_id):

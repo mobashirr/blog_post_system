@@ -126,7 +126,7 @@ response will be like this:
 ```
 example usage:
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"first_name": "someone","last_name": "bin fulan", "email": "something@gmail.com", "password": "anypass", "birthday": "2020/04/16"}' http://127.0.0.1:5000/api/v1/register
+curl -X POST -H "Content-Type: application/json" -d '{"first_name": "someone","last_name": "bin fulan", "email": "some@gmail.com", "password": "anypass", "birthday": "2020/04/16"}' http://127.0.0.1:5000/api/v1/register
 ```
 note: birthday is default to 1990/1/1 if not submited
 
@@ -135,12 +135,12 @@ note: birthday is default to 1990/1/1 if not submited
 /api/v1/login
 ```
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"email": "something@gmail.com", "password": "anypass"}' http://127.0.0.1:5000/api/v1/login
+curl -X POST -H "Content-Type: application/json" -d '{"email": "some@gmail.com", "password": "anypass"}' http://127.0.0.1:5000/api/v1/login
 ```
 you should get response like this:
 ```
 {
-  "access_token": <"8602e158abc2089561159e42348aa869c645ee6f198a04b5f6a678cc3150c256">,
+  "access_token": <"29999331e13108d00dbae7584b1c2e113253af44e16b7be013e7a04544722a91">,
   "messege": "successfully authorized, your token is valid for 2h."
 }
 ```
@@ -151,5 +151,43 @@ api/v1/blogs
 ```
 example usage:
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"title": "blog title","content": "blog contnt", "access_token": "<access_token>"}' http://127.0.0.1:5000/api/v1/blogs
+curl -X POSt \
+-H "Authorization: Bearer <access_token>" \
+-H "Content-Type: application/json" \
+-d '{"title": "blog title","content": "blog contnt"}' \
+http://127.0.0.1:5000/api/v1/blogs
+```
+
+3. put reqests
+
+```
+api/v1/users
+```
+example usage:
+```
+curl -X PUT \
+-H "Authorization: Bearer  <acess_token>" \
+-H "Content-Type: application/json" \
+-d '{"email": "new@gmail.com","first_name": "new first name", "password": "newpass"}' \
+http://127.0.0.1:5000/api/v1/users
+
+```
+you can modify: ['first_name', 'last_name', 'email', 'birthday', "password"]
+
+you may get response like this :
+```
+{
+    "message": "User 6 updated successfully",
+    "user": {
+        "id": 6,
+        "first_name": "new AA first name",
+        "last_name": "new BB last_name"
+    }
+}
+```
+or
+```
+{
+    "error": "Email new@gmail.com is already in use."
+}
 ```
