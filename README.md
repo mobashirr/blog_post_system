@@ -47,6 +47,7 @@ pip3 install -r requirements.txt
 1. Get requests
 
 - users
+
 sence its a blog post system some data will be in public,
 things like posts and post's author name or post's comments, etc.. 
 but it has to be limited to the need only
@@ -54,25 +55,41 @@ meaning we can't publish sensetive data(passwords, email, phone number, etc..)
 
 this endpoint is for public data encluding first name, last name and uniuqe id only so there is no authentcaion needed
 ```
-api/v1/users?user_id=<int:id>
-```
-example usage:
-```
-curl -X GET "http://127.0.0.1:5000/api/v1/users?user_id=2" 
-```
-
-to get user personal data use this endpoint which need the authentcation step
-each user can have access to his own private data only
-```
 api/v1/users/<int:user_id>
 ```
 example usage:
 ```
-curl -X GET "http://127.0.0.1:5000/api/v1/users/<int:user_id>" \
--H "Authorization: Bearer <access_token>
+curl -X GET "http://127.0.0.1:5000/api/v1/users/2"
+```
+note: if you set user_id to zero you get list of all users
+
+to get user personal data use this endpoint which need the authentcation step
+each user can have access to his own private data only
+```
+api/v1/users
+```
+example usage:
+```
+curl -X GET "http://127.0.0.1:5000/api/v1/users" \
+-H "Authorization: Bearer <access_token>"
+```
+you should get response like this
+```
+{
+  "users": {
+    "birthday": "Mon, 01 Jan 1990 00:00:00 GMT",
+    "email": "something@gmail.com",
+    "first_name": "someone",
+    "id": 4,
+    "join_date": "Tue, 31 Dec 2024 17:56:46 GMT",
+    "last_name": "bin someone",
+    ...
+  }
+}
 ```
 
 - blogs
+
 ```
 /api/v1/blogs
 ```
@@ -81,6 +98,24 @@ by adding this filters in the query parameters or the url of the request,
 by default if no parameters given all posts will be returned (soon we will implement pageintaion)
 ```
 curl -X GET "http://127.0.0.1:5000/api/v1/blogs?author_id=303&blog_id=4&blog_title=blog%20title"
+```
+response will be like this:
+```
+{
+  "blogs": [
+    {
+      "author_id": 303,
+      "author_name": "someone",
+      "blog_id": 4,
+      "content": "blog contant",
+      "created_at": "Tue, 31 Dec 2024 12:13:57 GMT",
+      "image_header_path": "default.png",
+      "title": "blog title",
+      "updated_at": "Tue, 31 Dec 2024 12:13:57 GMT",
+      ...
+    }
+  ]
+}
 ```
 
 2. Post requests
@@ -116,5 +151,5 @@ api/v1/blogs
 ```
 example usage:
 ```
-curl -X POST -H "Content-Type: application/json" -d '{"title": "blog title","content": "blog contant", "access_token": "<access_token>"}' http://127.0.0.1:5000/api/v1/blogs
+curl -X POST -H "Content-Type: application/json" -d '{"title": "blog title","content": "blog contnt", "access_token": "<access_token>"}' http://127.0.0.1:5000/api/v1/blogs
 ```

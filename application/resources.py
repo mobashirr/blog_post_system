@@ -4,7 +4,6 @@
 this module contain the api resources (endpoints logic)
 '''
 
-
 from flask import jsonify, request
 from flask_restful import Resource
 from application.models import Blog, User
@@ -13,20 +12,55 @@ from bcrypt import hashpw, gensalt, checkpw
 from application.auth import AUTH as authorizer
 
 
-class users(Resource):
+
+class Users(Resource):
 	'''
-	get users data
+	we provide a resource for users private data (users emails and birthday, etc..)
+	which requires an authentcation step
 	'''
 	def get(self):
 		'''
+		get users private data
+		'''
+		# get the access token from http headrs
+		authoraization_header = request.headers.get("Authorization");
+
+		if not authoraization_header:
+			return jsonify({'error': 'missing the authrization header'}),401;
+
+		if not authoraization_header.startswith("Bearer "):
+			return jsonify({'error': 'Bearer Authization only allowed'}),401;
+
+
+		access_token = authoraization_header.split()[1];
+		authorized_user = authorizer.isauthorized(access_token);
+		if authorized_user:
+			# user is authrized and is accessing his own data
+			user = User.get_user_by_id(user_id=authorized_user);
+			if user:
+				return jsonify({'users':user.json_all_data()});
+
+		return jsonify({'users':[]});
+
+
+class UserList(Resource):
+	'''
+	get users data
+	'''
+	def get(self,user_id):
+		'''
 		get users public data
 		'''
-		data = request.args;
-		user_id = data.get('user_id');
 		if user_id:
+			# non-zero id
 			user = User.get_user_by_id(user_id=user_id);
 			if user:
+				print(f'user with id {user.id} ')
 				return jsonify({'users':user.json()});
+			else:
+				return jsonify({'users':[]})
+
+		# when given id is zero then we want all users
 		users = [u.json() for u in User.get_all_users()];
 		return jsonify({'users':users});
 
@@ -107,8 +141,8 @@ class login(Resource):
 		return jsonify({'error': 'email or password missed.'});
 	
 
-class blogs(Resource):
-
+class BlogsList(Resource):
+	''''''
 	def get(self):
 		author_id = request.args.get('author_id');
 		blog_id = request.args.get('blog_id');
@@ -129,13 +163,19 @@ class blogs(Resource):
 		parser = reqparse.RequestParser();
 		parser.add_argument('title', type=str, help='blog title');
 		parser.add_argument('content', type=str, help='blog content');
-		parser.add_argument('access_token', type=str, help='access token is required for authentcation');
-
 		data = parser.parse_args();
 		title = data.get('title');
 		content = data.get('content');
-		access_token = data.get('access_token');
 
+		authoraization_header = request.headers.get("Authorization");
+
+		if not authoraization_header:
+			return jsonify({'error': 'missing the authorization header'}),401;
+
+		if not authoraization_header.startswith("Bearer "):
+			return jsonify({'error': 'Bearer Athentcation is only allowed'}),401;
+
+		access_token = authoraization_header.split()[1];
 		authorized_user = authorizer.isauthorized(access_token);
 		if authorized_user:
 			if title and content:

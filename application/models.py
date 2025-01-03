@@ -31,6 +31,19 @@ class User(db.Model):
             'last_name': self.last_name,
         }
 
+    def json_all_data(self):
+        '''
+        json representaion of the table
+        '''
+        return {
+            'id': self.id,
+            'first_name': self.first_name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'birthday': self.birth_day,
+            'join_date': self.join_date
+        };
+
     @staticmethod
     def create_user(first_name, last_name, email, hashed_password, birth_day=None):
         '''

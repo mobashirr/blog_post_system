@@ -24,8 +24,10 @@ with app.app_context():
 
 
 # add the resources to flask application
-from application.resources import blogs, register, login,users
-api.add_resource(blogs, '/api/v1/blogs');
+from application.resources import BlogsList, register, login, UserList, Users
+api.add_resource(BlogsList, '/api/v1/blogs');
 api.add_resource(register, '/api/v1/register');
 api.add_resource(login, '/api/v1/login');
-api.add_resource(users, '/api/v1/users');
+api.add_resource(UserList, '/api/v1/users/<int:user_id>');   # public users list
+api.add_resource(Users, '/api/v1/users'); # private users resource
+
