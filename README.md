@@ -2,8 +2,8 @@
 
 
 # about the project
-this project is a simple back-end system for blog posts web based application
-providing a simple api at ... ip ...
+this project is a simple back-end system api for blog posts web based application,
+we provide a live api at http://157.245.135.17:7777/api/v1
 
 
 # getting started
@@ -173,7 +173,6 @@ http://127.0.0.1:5000/api/v1/users
 
 ```
 you can modify: ['first_name', 'last_name', 'email', 'birthday', "password"]
-
 you may get response like this :
 ```
 {
@@ -201,13 +200,52 @@ example usage:
 curl -X PUT \
 -H "Authorization: Bearer  <acess_token>" \
 -H "Content-Type: application/json" \
--d '{"blog_id": 4 ,"title": "new title", "content":"new content"}' \
+-d '{"blog_id": 4 ,"new_title": "new title", "new_content":"new content"}' \
 http://127.0.0.1:5000/api/v1/blogs
 ```
+you should get response like this:
+```
+{'message': 'blog 4 updated successfully', 'blog': {'blog_id': 4, 'title': 'new title', 'author_id': 3, 'author_name': 'someone name', 'content': 'new content', 'image_header_path': 'images/default.png', 'created_at': '2025-01-05 17:28:28', 'updated_at': '2025-01-05 17:28:29'}}
+```
+you can modify: ['title', 'content']
 
 
 4. delete requests
 
 ```
+api/v1/users
+```
+example usage:
+```
+curl -X DELETE \
+-H "Authorization: Bearer  c6b0d65efccc2e4cf8e8aeab68b7bdddf88e8c8ff1d52627437657bd347baebc" \
+-H "Content-Type: application/json" \
+http://127.0.0.1:5000/api/v1/blogs
+```
+you may get response like this:
+```
+{'message': 'user have been deleted', 'user': {'id': 3, 'first_name': 'new name', 'last_name': 'new last name'}}
+```
+or if user not exist or deleted before:
+```
+{"message": "user not found"}
+```
+note: when deleting the user all of his blogs will also be deleted
+
 
 ```
+api/v1/blogs
+```
+example usage:
+```
+curl -X DELETE \
+-H "Authorization: Bearer  <acess_token>" \
+-H "Content-Type: application/json" \
+-d '{"blog_id": 4}' \
+http://127.0.0.1:5000/api/v1/blogs
+```
+response:
+```
+{'message': 'blog have been deleted', 'blog': {'blog_id': 1, 'title': 'new title', 'author_id': 3, 'author_name': 'new name new last name', 'content': 'con', 'image_header_path': 'images/default.png', 'created_at': '2025-01-05 17:28:28', 'updated_at': '2025-01-05 17:28:29'}}
+```
+note: if you try to delete a blog that is not your the request will be unauthorized

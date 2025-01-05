@@ -3,3 +3,4 @@ venv
 instance
 *.cpython-310.pyc
 note.text
+test.py
