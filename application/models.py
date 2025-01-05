@@ -120,10 +120,11 @@ class User(db.Model):
     def delete_user(user_id):
         user = User.query.get(user_id)
         if user:
+            user_data = user.json()
             db.session.delete(user)
             db.session.commit()
-            return True
-        return False
+            return {"message": "user have been deleted", "user":user_data}
+        return {"message": "user not found"}
 
 
 # Blog Model
@@ -153,8 +154,8 @@ class Blog(db.Model):
             'author_name': fullname,
             'content': self.content,
             'image_header_path': self.image_header_path,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'created_at': str(self.created_at),
+            'updated_at': str(self.updated_at)
         }
 
     @staticmethod
@@ -162,7 +163,7 @@ class Blog(db.Model):
         new_blog = Blog(title=title,author_id=author_id, content=content, image_header_path=image_header_path)
         db.session.add(new_blog)
         db.session.commit()
-        return new_blog
+        return {"messege":f"new blog with id ({new_blog.blog_id} created","blogs":new_blog.json()}
 
     @staticmethod
     def get_all_blogs():
@@ -187,26 +188,33 @@ class Blog(db.Model):
             query_dict['blog_id'] = blog_id;
         if blog_title:
             query_dict['title'] = blog_title;
-        return Blog.query.filter_by(**query_dict);
+        if query_dict:
+            return Blog.query.filter_by(**query_dict);
+        return Blog.get_all_blogs()
 
     @staticmethod
     def update_blog(blog_id, updates):
         blog = Blog.query.get(blog_id)
+        can_modify = ['title','content']
         if blog:
             for key, value in updates.items():
-                setattr(blog, key, value)
+                if key in can_modify:
+                    if value:
+                        setattr(blog, key, value)
+            setattr(blog,"updated_at",db.func.current_timestamp())
             db.session.commit()
-            return blog
+            return {'message': f'blog {blog.blog_id} updated successfully', 'blog': blog.json()},200
         return None
 
     @staticmethod
     def delete_blog(blog_id):
         blog = Blog.query.get(blog_id)
         if blog:
+            blog_content = blog.json()
             db.session.delete(blog)
             db.session.commit()
-            return True
-        return False
+            return {'message': 'blog have been deleted',"blog":blog_content},200
+        return {"message": "blog not found"},400
 
 
 # Comment Model
