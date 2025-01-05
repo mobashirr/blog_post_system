@@ -12,6 +12,18 @@ from bcrypt import hashpw, gensalt, checkpw
 from application.auth import AUTH as authorizer
 
 
+def check_authorization():
+	# get the access token from http headrs
+	authoraization_header = request.headers.get("Authorization");
+	if not authoraization_header:
+		return jsonify({'error': 'missing the authrization header'}),401;
+	if not authoraization_header.startswith("Bearer "):
+		return jsonify({'error': 'Bearer Authization only allowed'}),401;
+	access_token = authoraization_header.split()[1];
+	authorized_user = authorizer.isauthorized(access_token);
+	return authorized_user
+
+
 class Users(Resource):
 	'''
 	we provide a resource for users private data (users emails and birthday, etc..)
@@ -21,18 +33,9 @@ class Users(Resource):
 		'''
 		get users private data
 		'''
-		# get the access token from http headrs
-		authoraization_header = request.headers.get("Authorization");
+		# authorization step:
+		authorized_user = check_authorization();
 
-		if not authoraization_header:
-			return jsonify({'error': 'missing the authrization header'}),401;
-
-		if not authoraization_header.startswith("Bearer "):
-			return jsonify({'error': 'Bearer Authization only allowed'}),401;
-
-
-		access_token = authoraization_header.split()[1];
-		authorized_user = authorizer.isauthorized(access_token);
 		if authorized_user:
 			# user is authrized and is accessing his own data
 			user = User.get_user_by_id(user_id=authorized_user);
@@ -43,18 +46,8 @@ class Users(Resource):
 
 	def put(self):
 
-		# get the access token from http headrs
-		authoraization_header = request.headers.get("Authorization");
-
-		if not authoraization_header:
-			return jsonify({'error': 'missing the authrization header'}),401;
-
-		if not authoraization_header.startswith("Bearer "):
-			return jsonify({'error': 'Bearer Authrization only allowed'}),401;
-
-
-		access_token = authoraization_header.split()[1];
-		authorized_user = authorizer.isauthorized(access_token);
+		# authorization step:
+		authorized_user = check_authorization()
 		if authorized_user:
 			data = request.get_json()
 			if data:
@@ -65,7 +58,6 @@ class Users(Resource):
 				return {'message': 'No new data provided'}, 400
 
 		return {'error': 'Unauthorized'}, 401
-
 
 
 class UserList(Resource):
@@ -166,13 +158,13 @@ class login(Resource):
 	
 
 class BlogsList(Resource):
-	''''''
-	def get(self):
+	'''
+	public blogs resource
+	'''
+	def get(self,blog_id):
 		author_id = request.args.get('author_id');
-		blog_id = request.args.get('blog_id');
 		blog_title = request.args.get('blog_title');
-
-		if author_id or blog_id or blog_title:
+		if blog_id or author_id or blog_title:
 			blogs = [bl.json() for bl in Blog.get_blog_by_user_id(
 			author_id=author_id,
 			blog_id=blog_id,
@@ -181,31 +173,64 @@ class BlogsList(Resource):
 			blogs = [blog.json() for blog in Blog.get_all_blogs()];
 		return jsonify({'blogs':blogs});
 
+
+class Blogs(Resource):
+	'''
+	protected blogs resource
+	'''
 	def post(self):
+		'''
+		create new blog
+		'''
 		# Argument validator
 		parser = reqparse.RequestParser()
-		parser.add_argument('title', type=str, help='Blog title')
-		parser.add_argument('content', type=str, help='Blog content')
 
-		authorization_header = request.headers.get("Authorization")
-
-		if not authorization_header:
-			return {'error': 'Missing the authorization header'}, 401
-
-		if not authorization_header.startswith("Bearer "):
-			return {'error': 'Bearer Authentication is only allowed'}, 401
-
-		access_token = authorization_header.split()[1]
-		authorized_user = authorizer.isauthorized(access_token)
+		# authorization step:
+		authorized_user = check_authorization();
 		if authorized_user:
+			parser.add_argument('title', type=str, help='Blog title')
+			parser.add_argument('content', type=str, help='Blog content')
 			data = parser.parse_args()
 			title = data.get('title')
 			content = data.get('content')
 			if title and content:
 				new_blog = Blog.create_blog(title=title, content=content, author_id=authorized_user)
-				return {'message': f'New blog with ID {new_blog.blog_id} created'}, 201
+				return new_blog, 201
 			return {'message': 'Incomplete data received'}, 400
 		else:
-			return {'error': 'Unauthorized action'}, 403
+			return {'error': 'Unauthorized action'}, 401
 
+	def put(self):
+		'''
+		update an existing blog
+		'''
+		# authorization step:
+		authorized_user = check_authorization();
 
+		if authorized_user:
+			data = request.get_json()
+			if data:
+				blog_id = data.get('blog_id')
+				blog_title = data.get('new_title')
+				blog_content = data.get("new_content")
+				new_data = {"title":blog_title,"content":blog_content}
+				blog_to_update = Blog.get_blog_by_user_id(author_id=authorized_user,blog_id=blog_id).first()
+
+				# we need to check if the user want to remove his own blog not someone else
+				if blog_to_update:
+					update_result = Blog.update_blog(blog_to_update.blog_id, new_data)
+					return update_result
+				else:
+					return {'message': 'could not identify this blog as user blog'}, 400
+			else:
+				return {'message': 'No new data provided'}, 400
+
+		return {'error': 'Unauthorized'}, 401
+
+	def delete(self):
+		
+		# authorization step:
+		authorized_user = check_authorization();
+
+		if authorized_user:
+			pass
