@@ -91,13 +91,13 @@ you should get response like this
 - blogs
 
 ```
-/api/v1/blogs
+/api/v1/blogs/<int:blog_id>?author_id=<int:id>&blog_title=<str:title>
 ```
 you can search for blogs by author_id or blog_id or even blog_title
 by adding this filters in the query parameters or the url of the request,
 by default if no parameters given all posts will be returned (soon we will implement pageintaion)
 ```
-curl -X GET "http://127.0.0.1:5000/api/v1/blogs?author_id=303&blog_id=4&blog_title=blog%20title"
+curl -X GET "http://127.0.0.1:5000/api/v1/blogs/4?author_id=303&blog_title=blog%20title"
 ```
 response will be like this:
 ```
@@ -190,4 +190,24 @@ or
 {
     "error": "Email new@gmail.com is already in use."
 }
+```
+
+- blogs
+```
+api/v1/blogs
+```
+example usage:
+```
+curl -X PUT \
+-H "Authorization: Bearer  <acess_token>" \
+-H "Content-Type: application/json" \
+-d '{"blog_id": 4 ,"title": "new title", "content":"new content"}' \
+http://127.0.0.1:5000/api/v1/blogs
+```
+
+
+4. delete requests
+
+```
+
 ```
