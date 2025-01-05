@@ -59,6 +59,27 @@ class Users(Resource):
 
 		return {'error': 'Unauthorized'}, 401
 
+	def delete(self):
+		'''
+		delete an existing user
+		'''
+
+		# authorization step:
+		authorized_user = check_authorization();
+		if authorized_user:
+			user_to_delete = User.get_user_by_id(user_id=authorized_user)
+			if user_to_delete:
+				# delete all blogs related to this user:
+				user_blogs = Blog.get_blog_by_user_id(author_id=user_to_delete.id)
+				for blog in user_blogs:
+					Blog.delete_blog(blog.blog_id)
+				# delete the user
+				result = User.delete_user(user_to_delete.id)
+				return result
+			else:
+				return {"message": "user not found"},400
+		return {'error': 'Unauthorized'}, 401
+
 
 class UserList(Resource):
 	'''
@@ -228,9 +249,27 @@ class Blogs(Resource):
 		return {'error': 'Unauthorized'}, 401
 
 	def delete(self):
+		'''
+		delete an existing blog
+		'''
 		
+		# Argument validator
+		parser = reqparse.RequestParser()
+
 		# authorization step:
 		authorized_user = check_authorization();
-
 		if authorized_user:
-			pass
+			parser.add_argument('blog_id', type=str, help='Blog title')
+			parser.add_argument('blog_title', type=str, help='Blog content')
+			data = parser.parse_args()
+			blog_id = data.get('blog_id')
+			blog_title = data.get('content')
+
+			blog_to_delete = Blog.get_blog_by_user_id(author_id=authorized_user,blog_id=blog_id).first()
+
+			if blog_to_delete:
+				result = Blog.delete_blog(blog_to_delete.blog_id)
+				return result
+			else:
+				return {"message": "blog not found"},400
+		return {'error': 'Unauthorized'}, 401
