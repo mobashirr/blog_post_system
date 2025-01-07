@@ -27,7 +27,7 @@ def check_authorization():
 class Users(Resource):
 	'''
 	we provide a resource for users private data (users emails and birthday, etc..)
-	which requires an authentcation step
+	which requires an authentcation step also for updating or deleting an existing user
 	'''
 	def get(self):
 		'''
@@ -40,12 +40,22 @@ class Users(Resource):
 			# user is authrized and is accessing his own data
 			user = User.get_user_by_id(user_id=authorized_user);
 			if user:
-				return jsonify({'users':user.json_all_data()});
-
-		return jsonify({'users':[]});
+				return {
+					"status":"success",
+					"message": "successfully authorized",
+					'user': str(user.json_all_data())
+				}, 200
+		else:
+			return {
+					"status":"error",
+					"message": "unauthorized user",
+					'user':[]
+				}, 401
 
 	def put(self):
-
+		'''
+		update user data
+		'''
 		# authorization step:
 		authorized_user = check_authorization()
 		if authorized_user:
@@ -55,15 +65,18 @@ class Users(Resource):
 				update_result = User.update_user(authorized_user, data)
 				return update_result
 			else:
-				return {'message': 'No new data provided'}, 400
+				return {
+					"status":"error",
+					'message': 'No new data provided'}, 400
 
-		return {'error': 'Unauthorized'}, 401
+		return {
+			"status":"error",
+			'message': 'Unauthorized'}, 401
 
 	def delete(self):
 		'''
 		delete an existing user
 		'''
-
 		# authorization step:
 		authorized_user = check_authorization();
 		if authorized_user:
@@ -77,8 +90,13 @@ class Users(Resource):
 				result = User.delete_user(user_to_delete.id)
 				return result
 			else:
-				return {"message": "user not found"},400
-		return {'error': 'Unauthorized'}, 401
+				return {
+					"status":"error",
+					"message": "user not found"
+					},400
+		return {
+			"status":"error",
+			'message': 'Unauthorized'}, 401
 
 
 class UserList(Resource):
@@ -92,15 +110,26 @@ class UserList(Resource):
 		if user_id:
 			# non-zero id
 			user = User.get_user_by_id(user_id=user_id);
-			if user:
-				print(f'user with id {user.id} ')
-				return jsonify({'users':user.json()});
-			else:
-				return jsonify({'users':[]})
+			print(type(user))
+			if not user:
+				return {
+					"status": "error",
+					"message": "user not found",
+					"user": []
+				}, 404
+			return jsonify({
+				"status": "success",
+				"message": "user found",
+				"user": str(user.json())
+			}), 200
+
 
 		# when given id is zero then we want all users
 		users = [u.json() for u in User.get_all_users()];
-		return jsonify({'users':users});
+		return {
+			"status": "success",
+			"message": "list of all users provided",
+			'users': users},200
 
 
 class register(Resource):
@@ -137,13 +166,19 @@ class register(Resource):
 					email=email,
 					hashed_password=hashed_pass,
 					birth_day=birthday);
-				return jsonify({
-					'messege': f'new user {new_user.first_name} with id {new_user.id} added'
-				})
-	
-		return jsonify({
-			'error': 'user already exist or invalid inputs'
-		});
+				
+				if new_user:
+					return {
+						"status":"success",
+						'messege': 'new user registered successfully',
+						'user':new_user.json()
+					},200
+				else:
+					return { "status": "error", "message": "couldn't opreate this action right now." },503
+			else:
+				return {"status": "error", "message": "Email is already registered." },409
+		else:
+			return { "status":"error","message": "required data missing"},400
 
 
 class login(Resource):
@@ -170,12 +205,17 @@ class login(Resource):
 				if valid_pass:
 					# start authintcation process:
 					token = authorizer.authorize(user_exist);
-					return jsonify({
-					'messege': 'successfully authorized your token is now valid for 1h.',
-					'access_token':token});
+
+					if token:
+						return ({
+						"status": "success",
+						'message': 'successfully authorized your token is now valid for 2h.',
+						'access_token':token}),200;
+					else:
+						return { "status": "error", "message": "couldn't opreate this action right now." },503
 				else:
-					return jsonify({'error': 'incorrect password or email'});
-		return jsonify({'error': 'email or password missed.'});
+					return { "status":"error","message": "incorrect password or email"},400
+		return { "status":"error","message": "required data missing"},400
 	
 
 class BlogsList(Resource):
@@ -192,7 +232,17 @@ class BlogsList(Resource):
 			blog_title=blog_title)];
 		else:
 			blogs = [blog.json() for blog in Blog.get_all_blogs()];
-		return jsonify({'blogs':blogs});
+		if blogs:
+			return {
+				"status":"success",
+				"message":"list of all blogs provided",
+				'blogs':blogs}, 200;
+		else:
+			return {
+				"status":"error",
+				"message": "couldn't find any blogs right now",
+				"blogs":[]
+			}
 
 
 class Blogs(Resource):

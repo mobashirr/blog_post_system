@@ -6,6 +6,7 @@
 from application.utils import db
 from datetime import datetime
 from bcrypt import hashpw, gensalt
+from flask import jsonify
 
 
 # User Model
@@ -41,9 +42,9 @@ class User(db.Model):
             'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
-            'birthday': self.birth_day,
-            'join_date': self.join_date
-        };
+            'birthday': str(self.birth_day),
+            'join_date': str(self.join_date)
+        }
 
     @staticmethod
     def create_user(first_name, last_name, email, hashed_password, birth_day=None):
@@ -106,15 +107,24 @@ class User(db.Model):
                         try:
                             value = datetime.strptime(value, '%Y/%m/%d').date()
                         except ValueError:
-                            return {'error': f"Invalid date format for birthday: {value}. Please use YYYY/MM/DD format."}, 400
+                            return {
+                                "status":"error",
+                                'message': f"Invalid date format for birthday: {value}. Please use YYYY/MM/DD format."}, 400
                     elif key == "email":
                         used_email = User.check_if_email_exist(value)
                         if used_email:
-                            return {'error': f"Email {value} is already in use."}, 400
+                            return {
+                                "status":"error",
+                                'message': f"Email {value} is already in use."}, 400
                     setattr(user, key, value)
             db.session.commit()
-            return {'message': f'User {user_id} updated successfully', 'user': user.json()}
-        return {'error': 'User not found'}, 404
+            return {
+                "status":"success",
+                'message': f'User {user_id} updated successfully',
+                'user': user.json()},200
+        return {
+            "status":"error",
+            'message': 'User not found'},404
 
     @staticmethod
     def delete_user(user_id):
@@ -123,8 +133,15 @@ class User(db.Model):
             user_data = user.json()
             db.session.delete(user)
             db.session.commit()
-            return {"message": "user have been deleted", "user":user_data}
-        return {"message": "user not found"}
+            return ({
+                "status":"success",
+                "message": "user have been deleted",
+                "user":user_data
+                },200)
+        return {
+            "status":"error",
+            "message": "user not found"
+            },400
 
 
 # Blog Model
@@ -163,7 +180,10 @@ class Blog(db.Model):
         new_blog = Blog(title=title,author_id=author_id, content=content, image_header_path=image_header_path)
         db.session.add(new_blog)
         db.session.commit()
-        return {"messege":f"new blog with id ({new_blog.blog_id} created","blogs":new_blog.json()}
+        return {
+            "status": "success",
+            "message":f"new blog with id {new_blog.blog_id} created",
+            "blogs":new_blog.json()}
 
     @staticmethod
     def get_all_blogs():
@@ -203,7 +223,10 @@ class Blog(db.Model):
                         setattr(blog, key, value)
             setattr(blog,"updated_at",db.func.current_timestamp())
             db.session.commit()
-            return {'message': f'blog {blog.blog_id} updated successfully', 'blog': blog.json()},200
+            return {
+                "status": "success",
+                'message': f'blog {str(blog.blog_id)} updated successfully',
+                'blog': str(blog.json())},200
         return None
 
     @staticmethod
@@ -213,8 +236,12 @@ class Blog(db.Model):
             blog_content = blog.json()
             db.session.delete(blog)
             db.session.commit()
-            return {'message': 'blog have been deleted',"blog":blog_content},200
-        return {"message": "blog not found"},400
+            return {
+                "status":"success",
+                'message': 'blog have been deleted',"blog":blog_content},200
+        return {
+            "status": "error",
+            "message": "blog not found"},400
 
 
 # Comment Model
