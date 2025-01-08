@@ -2,7 +2,7 @@
 # Blog Post System API
 
 ## About the Project
-This project is a simple back-end system API for a blog post web-based application. A live API is hosted at:
+This project is a simple back-end system API for a blog post web-based application. A live API Demo is hosted at:
 **http://157.245.135.17:7777/api/v1**
 
 ---
