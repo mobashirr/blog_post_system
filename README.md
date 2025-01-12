@@ -73,17 +73,16 @@ This project is a simple back-end system API for a blog post web-based applicati
   - Response:
     ```json
     {
-      'status': 'success',
-      'message': 'successfully authorized',
-      'user':
+      "status": "success",
+      "message": "successfully authorized",
+      "user":
       {
-        'id': 13,
-        'first_name': 'some',
-        'last_name': 'one',
-        'email': 'someone@gmail.com',
-        'birthday': '2009-05-23',
-        'join_date': '2025-01-07 20:26:52'
-      }
+        "id": 13,
+        "first_name": "some",
+        "last_name": "one",
+        "email": "someone@gmail.com",
+        "birthday": "2009-05-23",
+        "join_date": "2025-01-07 20:26:52"
       }
     ```
 
@@ -151,13 +150,13 @@ This project is a simple back-end system API for a blog post web-based applicati
       "message": "new blog with id 13 created"
       "blog":
       {
-        'blog_id': 13,
-        'title': 'title',
-        'author_id': 13,
-        'author_name': 'name',
-        'content': 'content',
-        'created_at': '2025-01-07 20:36:03',
-        'updated_at': '2025-01-07 20:36:03'
+        "blog_id": 13,
+        "title": "title",
+        "author_id": 13,
+        "author_name": "name",
+        "content": "content",
+        "created_at": "2025-01-07 20:36:03",
+        "updated_at": "2025-01-07 20:36:03"
       }
     }
     ```
@@ -208,9 +207,9 @@ This project is a simple back-end system API for a blog post web-based applicati
       "message": "user have been deleted",
       "user": 
       {
-        'id': 13,
-        'first_name': 'new name',
-        'last_name': 'new last name'
+        "id": 13,
+        "first_name": "new name",
+        "last_name": "new last name"
       }
     }
     ```
