@@ -9,18 +9,18 @@ This project is a simple back-end system API for a blog post web-based applicati
 
 ## Getting Started
 
-1. Clone the repository:
+1- Clone the repository:
    ```bash
    git clone
    ```
 
-2. Install project requirements:
+2- Install project requirements:
    ```bash
    pip3 install -r requirements.txt
    ```
    *(Optional: Use a virtual environment for dependency management)*
 
-3. Configure your database and Redis client server as needed.
+3- Configure your database and Redis client server as needed.
 
 ---
 
