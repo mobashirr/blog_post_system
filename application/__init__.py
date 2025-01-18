@@ -31,5 +31,5 @@ api.add_resource(BlogsList, '/api/v1/blogs/<int:blog_id>');
 api.add_resource(Blogs, '/api/v1/blogs')
 api.add_resource(register, '/api/v1/register')
 api.add_resource(login, '/api/v1/login')
-api.add_resource(UserList, '/api/v1/users/<int:user_id>');   # public users list
-api.add_resource(Users, '/api/v1/users'); # private users resource
+api.add_resource(UserList, '/api/v1/users/<int:user_id>')  # public users list
+api.add_resource(Users, '/api/v1/users')  # private users resource
