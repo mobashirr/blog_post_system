@@ -12,8 +12,8 @@ from flask_restful import Api
 from application.utils import db
 
 # creating flask app and flask_rest extention
-app = Flask(__name__);
-api = Api(app);
+app = Flask(__name__)
+api = Api(app)
 
 # app config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db' # we are using flask sqlachemy ORM
