@@ -16,7 +16,8 @@ app = Flask(__name__)
 api = Api(app)
 
 # app config
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db' # we are using flask sqlachemy ORM
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
+# we are using flask sqlachemy ORM
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
