@@ -9,7 +9,7 @@ This project is a simple back-end system API for a blog post web-based applicati
 
 ## Getting Started
 
-1. Clone the repository:
+1- Clone the repository:
    ```bash
    git clone
    ```
