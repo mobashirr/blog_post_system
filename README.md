@@ -20,7 +20,7 @@ This project is a simple back-end system API for a blog post web-based applicati
    ```
    *(Optional: Use a virtual environment for dependency management)*
 
-3. Configure your database and Redis client server as needed.
+3- Configure your database and Redis client server as needed.
 
 ---
 
