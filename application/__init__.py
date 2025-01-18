@@ -17,8 +17,8 @@ api = Api(app);
 
 # app config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db' # we are using flask sqlachemy ORM
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False;
-db.init_app(app);
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db.init_app(app)
 
 with app.app_context():
     db.create_all()  # Ensures database tables are created
