@@ -27,7 +27,7 @@ with app.app_context():
 
 # add the resources to flask application
 from application.resources import BlogsList, Blogs, register, login, UserList, Users
-api.add_resource(BlogsList, '/api/v1/blogs/<int:blog_id>');
+api.add_resource(BlogsList, '/api/v1/blogs/<int:blog_id>')
 api.add_resource(Blogs, '/api/v1/blogs')
 api.add_resource(register, '/api/v1/register')
 api.add_resource(login, '/api/v1/login')
