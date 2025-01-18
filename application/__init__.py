@@ -31,4 +31,3 @@ api.add_resource(register, '/api/v1/register');
 api.add_resource(login, '/api/v1/login');
 api.add_resource(UserList, '/api/v1/users/<int:user_id>');   # public users list
 api.add_resource(Users, '/api/v1/users'); # private users resource
-
