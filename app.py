@@ -6,4 +6,5 @@ from application import app
 
 
 if __name__ == '__main__':
+	# Ensures this script is being run directly and not imported as a module
 	app.run(debug = True);
