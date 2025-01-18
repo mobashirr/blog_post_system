@@ -14,7 +14,7 @@ This project is a simple back-end system API for a blog post web-based applicati
    git clone
    ```
 
-2. Install project requirements:
+2- Install project requirements:
    ```bash
    pip3 install -r requirements.txt
    ```
