@@ -2,7 +2,8 @@
 
 '''
 intialaization of the application instances
-this is python packege only import the name of the dir and this file will be imported
+this is python packege only import the name of
+the dir and this file will be imported
 '''
 
 
