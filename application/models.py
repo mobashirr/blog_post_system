@@ -118,10 +118,7 @@ class User(db.Model):
                                 'message': f"Email {value} is already in use."}, 400
                     setattr(user, key, value)
             db.session.commit()
-            return {
-                "status":"success",
-                'message': f'User {user_id} updated successfully',
-                'user': user.json()},200
+            return {'status':'success', 'message':f"updated successfully", 'user':user.json()},200
         return {
             "status":"error",
             'message': 'User not found'},404
@@ -183,7 +180,8 @@ class Blog(db.Model):
         return {
             "status": "success",
             "message":f"new blog with id {new_blog.blog_id} created",
-            "blogs":new_blog.json()}
+            "blogs":new_blog.json()
+            }
 
     @staticmethod
     def get_all_blogs():

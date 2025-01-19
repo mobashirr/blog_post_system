@@ -110,18 +110,17 @@ class UserList(Resource):
 		if user_id:
 			# non-zero id
 			user = User.get_user_by_id(user_id=user_id);
-			print(type(user))
 			if not user:
 				return {
-					"status": "error",
-					"message": "user not found",
+					"status": "success",
+					"message": "no user found",
 					"user": []
-				}, 404
-			return jsonify({
+				}, 204
+			return {
 				"status": "success",
 				"message": "user found",
-				"user": str(user.json())
-			}), 200
+				"user": user.json()
+			}, 200
 
 
 		# when given id is zero then we want all users
@@ -172,7 +171,7 @@ class register(Resource):
 						"status":"success",
 						'messege': 'new user registered successfully',
 						'user':new_user.json()
-					},200
+					},201
 				else:
 					return { "status": "error", "message": "couldn't opreate this action right now." },503
 			else:
@@ -232,17 +231,11 @@ class BlogsList(Resource):
 			blog_title=blog_title)];
 		else:
 			blogs = [blog.json() for blog in Blog.get_all_blogs()];
-		if blogs:
-			return {
-				"status":"success",
-				"message":"list of all blogs provided",
-				'blogs':blogs}, 200;
-		else:
-			return {
-				"status":"error",
-				"message": "couldn't find any blogs right now",
-				"blogs":[]
-			}
+
+		return {
+			"status":"success",
+			"message":"list of blogs provided",
+			'blogs':blogs}, 200;
 
 
 class Blogs(Resource):
