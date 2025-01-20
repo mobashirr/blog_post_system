@@ -3,6 +3,7 @@ import requests
 
 BASE_URL = "http://localhost:5000/api"
 
+#testing authentication
 class TestAuthentication(unittest.TestCase):
     def test_register_user(self):
         payload = {"username": "testuser", "email": "test@test.com", "password": "password123"}
