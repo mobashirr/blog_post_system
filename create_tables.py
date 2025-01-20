@@ -1,4 +1,4 @@
-
+#creating a table for app
 from application import app, db
 
 
