@@ -1,6 +1,6 @@
 
 '''
-AUTH class modul
+AUTH class modu
 '''
 
 from application.utils import session_manger
