@@ -1,7 +1,7 @@
 import unittest
 from application import app
 
-#testing overall respoones in the project
+#testing api response
 class TestUserEndpoints(unittest.TestCase):
 	def setUp(self):
 		self.tester = app.test_client()
