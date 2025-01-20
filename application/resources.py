@@ -1,7 +1,7 @@
 #!/usr/bin/ python3
 
 '''
-this module contain the api resources (endpoints logi
+this module contain the api resources (endpoints logic
 '''
 
 from flask import jsonify, request
