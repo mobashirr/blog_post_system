@@ -2,7 +2,7 @@ import unittest
 import requests
 
 BASE_URL = "http://localhost:5000/api"
-#testing po
+#testin
 class TestPosts(unittest.TestCase):
     def setUp(self):
         # Register and log in to get the auth token
