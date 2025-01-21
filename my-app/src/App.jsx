@@ -12,19 +12,39 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  // Add CORS configurations
-  withCredentials: true,
-  credentials: "include",
 });
 
 // Add interceptor to inject token into requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
-  return config;
-});
+);
+
+// Add response interceptor to handle common errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // The server responded with a status code outside the 2xx range
+      console.error("Response error:", error.response.data);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error("Request error:", error.request);
+    } else {
+      // Something happened in setting up the request
+      console.error("Error:", error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 const App = () => {
   const [user, setUser] = useState(null);
