@@ -1,7 +1,50 @@
-import { useState, useEffect } from 'react';
-import AuthForm from './components/AuthForm';
-import BlogList from './components/BlogList';
-import BlogForm from './components/BlogForm';
+import { useState, useEffect } from "react";
+import AuthForm from "./components/AuthForm";
+import BlogList from "./components/BlogList";
+import BlogForm from "./components/BlogForm";
+import axios from "axios";
+
+const BASE_URL = "http://157.245.135.17:7777/api/v1";
+
+// Create axios instance with base configuration
+const api = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+// Add interceptor to inject token into requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle common errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response) {
+      // The server responded with a status code outside the 2xx range
+      console.error("Response error:", error.response.data);
+    } else if (error.request) {
+      // The request was made but no response was received
+      console.error("Request error:", error.request);
+    } else {
+      // Something happened in setting up the request
+      console.error("Error:", error.message);
+    }
+    return Promise.reject(error);
+  }
+);
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -10,8 +53,7 @@ const App = () => {
   const [isLogin, setIsLogin] = useState(true);
 
   useEffect(() => {
-    // Check for stored token and fetch user data if exists
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       fetchUserData(token);
     }
@@ -25,62 +67,89 @@ const App = () => {
 
   const fetchUserData = async (token) => {
     try {
-      // Add your API call here to validate token and get user data
-      // setUser(userData);
+      const response = await api.get("/users");
+      setUser(response.data.user);
     } catch (error) {
-      console.error('Error fetching user data:', error);
-      localStorage.removeItem('token');
+      console.error("Error fetching user data:", error);
+      localStorage.removeItem("token");
     }
   };
 
   const fetchBlogs = async () => {
     try {
-      // Add your API call here to fetch blogs
-      // setBlogs(blogsData);
+      const response = await api.get("/blogs/0"); // Using 0 to get all blogs
+      setBlogs(response.data.blogs);
     } catch (error) {
-      console.error('Error fetching blogs:', error);
+      console.error("Error fetching blogs:", error);
     }
   };
 
   const handleAuth = async (formData) => {
     try {
-      // Add your API call here for login/register
-      // const response = await api.post('/auth/login', formData);
-      // localStorage.setItem('token', response.data.token);
-      // setUser(response.data.user);
+      const endpoint = isLogin ? "/login" : "/register";
+      const response = await api.post(endpoint, formData);
+
+      if (response.data.status === "success") {
+        localStorage.setItem("token", response.data.access_token);
+        // After login/register, fetch user data
+        await fetchUserData(response.data.access_token);
+      }
     } catch (error) {
-      console.error('Auth error:', error);
+      console.error("Auth error:", error);
+      throw error; // Propagate error to form component
     }
   };
 
   const handleCreateBlog = async (formData) => {
     try {
-      // Add your API call here to create blog
-      // const response = await api.post('/blogs', formData);
-      // setBlogs([...blogs, response.data]);
+      const response = await api.post("/blogs", {
+        title: formData.title,
+        content: formData.content,
+      });
+
+      if (response.data.status === "success") {
+        setBlogs([...blogs, response.data.blog]);
+      }
     } catch (error) {
-      console.error('Error creating blog:', error);
+      console.error("Error creating blog:", error);
+      throw error;
     }
   };
 
   const handleUpdateBlog = async (formData) => {
     try {
-      // Add your API call here to update blog
-      // const response = await api.put(`/blogs/${editingBlog.id}`, formData);
-      // setBlogs(blogs.map(blog => blog.id === editingBlog.id ? response.data : blog));
-      setEditingBlog(null);
+      const response = await api.put("/blogs", {
+        blog_id: editingBlog.blog_id,
+        new_title: formData.title,
+        new_content: formData.content,
+      });
+
+      if (response.data.status === "success") {
+        setBlogs(
+          blogs.map((blog) =>
+            blog.blog_id === editingBlog.blog_id ? response.data.blog : blog
+          )
+        );
+        setEditingBlog(null);
+      }
     } catch (error) {
-      console.error('Error updating blog:', error);
+      console.error("Error updating blog:", error);
+      throw error;
     }
   };
 
   const handleDeleteBlog = async (blogId) => {
     try {
-      // Add your API call here to delete blog
-      // await api.delete(`/blogs/${blogId}`);
-      // setBlogs(blogs.filter(blog => blog.id !== blogId));
+      const response = await api.delete("/blogs", {
+        data: { blog_id: blogId },
+      });
+
+      if (response.data.message === "blog have been deleted") {
+        setBlogs(blogs.filter((blog) => blog.blog_id !== blogId));
+      }
     } catch (error) {
-      console.error('Error deleting blog:', error);
+      console.error("Error deleting blog:", error);
+      throw error;
     }
   };
 
@@ -92,7 +161,7 @@ const App = () => {
             onClick={() => setIsLogin(!isLogin)}
             className="text-blue-500 hover:text-blue-600"
           >
-            Switch to {isLogin ? 'Register' : 'Login'}
+            Switch to {isLogin ? "Register" : "Login"}
           </button>
         </div>
         <AuthForm isLogin={isLogin} onSubmit={handleAuth} />
@@ -106,7 +175,7 @@ const App = () => {
         <h1 className="text-3xl font-bold">Blog Dashboard</h1>
         <button
           onClick={() => {
-            localStorage.removeItem('token');
+            localStorage.removeItem("token");
             setUser(null);
           }}
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"

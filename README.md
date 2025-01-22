@@ -70,7 +70,7 @@ This project is a simple back-end system API for a blog post web-based applicati
     ```bash
     curl -X GET "http://127.0.0.1:5000/api/v1/users"     -H "Authorization: Bearer <access_token>"
     ```
-  - Response:
+  - Responses:
     ```json
     {
       "status": "success",
@@ -231,3 +231,4 @@ This project is a simple back-end system API for a blog post web-based applicati
       }
     }
     ```
+

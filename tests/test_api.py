@@ -1,6 +1,7 @@
 import unittest
 from application import app
 
+
 class TestUserEndpoints(unittest.TestCase):
 	def setUp(self):
 		self.tester = app.test_client()
