@@ -15,7 +15,8 @@ from flask_cors import CORS
 # creating flask app and flask_rest extention
 app = Flask(__name__)
 api = Api(app)
-cors = CORS(app, resources={r"*/api/v1/*": {"origins": "*"}})
+cors = CORS(app, resources={r"/api/*": {"origins": "*", "methods": ["GET", "POST", "PUT", "DELETE"]}})
+
 
 # app config
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
